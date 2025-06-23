@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Combination Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-control:hover {
+            border-color: #c1c9d2;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-group .form-control {
+            flex: 1;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn i {
+            margin-right: 10px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            border: none;
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-header i {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .results-header h3 {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stats-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+            word-break: break-all;
+            margin-right: 15px;
+        }
+
+        .file-download {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .file-download:hover {
+            color: white;
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tip {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+
+        .tip i {
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 30px 25px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-key"></i>
+            <h1>Password Generator</h1>
+            <p class="subtitle">Create secure password combinations with style</p>
+        </div>
+        
+        <div class="form-container">
+            <form method="POST" action="/" id="generatorForm">
+                <div class="form-group">
+                    <label for="passwords">
+                        <i class="fas fa-list"></i> Password Components
+                    </label>
+                    <input type="text" 
+                           id="passwords" 
+                           name="passwords" 
+                           class="form-control" 
+                           placeholder="Enter passwords separated by commas (e.g., hello, world, 123)"
+                           required>
+                </div>
+                
+                <div class="input-group">
+                    <div class="form-group">
+                        <label for="char_length">
+                            <i class="fas fa-ruler"></i> Character Length
+                        </label>
+                        <input type="number" 
+                               id="char_length" 
+                               name="char_length" 
+                               class="form-control" 
+                               min="1" 
+                               placeholder="8"
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="num_files">
+                            <i class="fas fa-files"></i> Split into Files
+                        </label>
+                        <input type="number" 
+                               id="num_files" 
+                               name="num_files" 
+                               class="form-control" 
+                               min="1" 
+                               value="1"
+                               placeholder="1"
+                               required>
+                    </div>
+                </div>
+                
+                <div class="tip">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>Pro Tip:</strong> Enter password components like "admin", "pass", "123" to generate combinations like "adminpass123" with your specified length.
+                </div>
+                
+                <button type="submit" class="btn" id="generateBtn">
+                    <i class="fas fa-magic"></i>
+                    Generate Combinations
+                </button>
+            </form>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating your password combinations...</p>
+            </div>
+            
+            {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    {{ error }}
+                </div>
+            {% endif %}
+            
+            {% if success and file_links %}
+                <div class="results-section">
+                    <div class="results-header">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Generation Complete!</h3>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <div class="stats-number">{{ "{:,}".format(combination_count) }}</div>
+                        <div class="stats-label">Total Combinations Generated</div>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 15px; color: #333;">
+                        <i class="fas fa-download"></i> Download Files
+                    </h4>
+                    <ul class="file-list">
+                        {% for file in file_links %}
+                            <li class="file-item">
+                                <span class="file-name">
+                                    <i class="fas fa-file-text"></i>
+                                    {{ file }}
+                                </span>
+                                <a href="/download/{{ file }}" class="file-download">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('generatorForm').addEventListener('submit', function(e) {
+            const loadingDiv = document.getElementById('loading');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            // Show loading state
+            loadingDiv.style.display = 'block';
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            
+            // Hide loading after a delay (in case of quick response)
+            setTimeout(() => {
+                if (loadingDiv.style.display === 'block') {
+                    loadingDiv.style.display = 'none';
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Combinations';
+                }
+            }, 30000); // 30 second timeout
+        });
+
+        // Add some interactive feedback
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Estimate combinations (simplified)
+        function updateEstimate() {
+            const passwordInput = document.getElementById('passwords').value;
+            const charLength = document.getElementById('char_length').value;
+            
+            if (passwordInput && charLength) {
+                const passwords = passwordInput.split(',').map(p => p.trim()).filter(p => p);
+                // This is a simplified estimate
+                const estimate = Math.min(Math.pow(passwords.length, 3), 100000);
+                console.log(`Estimated combinations: ${estimate}`);
+            }
+        }
+
+        document.getElementById('passwords').addEventListener('input', updateEstimate);
+        document.getElementById('char_length').addEventListener('input', updateEstimate);
+    </script>
+</body>
+</html>
